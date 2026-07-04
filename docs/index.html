@@ -1,5 +1,48 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>SAI Runner - deploying</title></head>
-<body style="background:#05070c;color:#9fb4c8;font-family:monospace;display:grid;place-items:center;min-height:100vh">
-<p>SAI Runner is deploying. Check back shortly.</p>
-</body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <title>SAI Runner - CCA-F Edition</title>
+    <meta name="application-name" content="SAI Runner - CCA-F Edition" />
+    <meta
+      name="description"
+      content="Cyber CX's SAI Teams Anthropic Claude Code Architect Study and Exam Prep Tool"
+    />
+    <style>
+      /* The page supports both themes, so the browser is told as much. The chrome theme
+         module (src/systems/theme.ts) sets the live light or dark choice on the html
+         element at runtime. */
+      :root { color-scheme: light dark; }
+      /* Neutral letterbox fill. The world renders at a fixed 16:9 and scales with FIT, so
+         bars can appear around the canvas. A medium grey reads as a frame in both the light
+         and the dark theme, rather than flashing paper-cream or near-black on a toggle. */
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: #3b3f45;
+        overflow: hidden;
+        font-family: "Press Start 2P", ui-monospace, monospace;
+      }
+      #app {
+        position: fixed;
+        inset: 0;
+        background: #3b3f45;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Crisp pixel scaling on the canvas. */
+      canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-rJm0HPjF.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DUaF2eBH.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>
