@@ -13,25 +13,51 @@
       name="description"
       content="Cyber CX's SAI Teams Anthropic Claude Code Architect Study and Exam Prep Tool"
     />
+
+    <!-- Link preview card (Open Graph + Twitter). og-cover.png ships from public/ so it keeps a
+         stable, non-hashed path. The image URL is absolute to the canonical domain, since scrapers
+         cannot resolve a relative path. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SAI Runner" />
+    <meta property="og:title" content="SAI Runner - CCA-F Edition" />
+    <meta
+      property="og:description"
+      content="A cyberpunk side-scroller that doubles as a Claude Code Architect exam prep tool."
+    />
+    <meta property="og:url" content="https://www.markuswalker.com/sai-runner/" />
+    <meta property="og:image" content="https://www.markuswalker.com/sai-runner/og-cover.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SAI Runner - CCA-F Edition" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SAI Runner - CCA-F Edition" />
+    <meta
+      name="twitter:description"
+      content="A cyberpunk side-scroller that doubles as a Claude Code Architect exam prep tool."
+    />
+    <meta name="twitter:image" content="https://www.markuswalker.com/sai-runner/og-cover.png" />
     <style>
       /* The page supports both themes, so the browser is told as much. The chrome theme
          module (src/systems/theme.ts) sets the live light or dark choice on the html
          element at runtime. */
       :root { color-scheme: light dark; }
-      /* Neutral letterbox fill. The world renders at a fixed 16:9 and scales with FIT, so
-         bars can appear around the canvas. A medium grey reads as a frame in both the light
-         and the dark theme, rather than flashing paper-cream or near-black on a toggle. */
+      /* Letterbox fill. The world renders at a fixed 16:9 and scales with FIT, so bars can appear
+         around the canvas. The frame now follows the chrome theme (theme.ts stamps data-theme on
+         the root): near-black in dark, a soft light grey in light, so a phone reads it as an
+         intentional dark frame rather than the old flat grey border. Default boots dark. */
+      :root { --letterbox: #05070c; }
+      :root[data-theme="light"] { --letterbox: #d5d9df; }
       html, body {
         margin: 0;
         height: 100%;
-        background: #3b3f45;
+        background: var(--letterbox);
         overflow: hidden;
         font-family: "Press Start 2P", ui-monospace, monospace;
       }
       #app {
         position: fixed;
         inset: 0;
-        background: #3b3f45;
+        background: var(--letterbox);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -118,11 +144,159 @@
           opacity: 0.5;
         }
       }
+
+      /* Team access gate. A lightweight speed bump, not real auth: this is a static site with no
+         server to check a password against, so the check runs client side and the code (hashed,
+         not plaintext) ships in the bundle same as everything else here. It is enough to keep a
+         shared link from being casually stumbled into; it is not a substitute for real access
+         control if that is ever needed. Sits above everything, including the boot splash. */
+      #gate {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: #05070c;
+        color: #cfe9ff;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, monospace;
+      }
+      #gate.gate-gone { display: none; }
+      .gate-card {
+        padding: 28px 32px;
+        border: 1px solid rgba(70, 230, 255, 0.35);
+        border-radius: 10px;
+        background: rgba(10, 14, 20, 0.65);
+        width: min(320px, 86vw);
+      }
+      .gate-title { font-size: 12px; letter-spacing: 0.24em; color: #46e6ff; margin-bottom: 16px; }
+      .gate-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px 12px;
+        font: 13px ui-monospace, monospace;
+        background: #0d1420;
+        color: #eaf9ff;
+        border: 1px solid rgba(70, 230, 255, 0.4);
+        border-radius: 6px;
+      }
+      .gate-input:focus { outline: 2px solid #46e6ff; outline-offset: 1px; }
+      .gate-btn {
+        margin-top: 12px;
+        width: 100%;
+        min-height: 44px;
+        padding: 10px;
+        font: 12px ui-monospace, monospace;
+        letter-spacing: 0.08em;
+        background: #167a94;
+        color: #eaf9ff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .gate-btn:active { background: #0e5a70; }
+      .gate-error { margin-top: 10px; font-size: 11px; color: #ff8080; min-height: 14px; }
     </style>
-    <script type="module" crossorigin src="./assets/index-rqkm_cdS.js"></script>
+    <script type="module" crossorigin src="./assets/index-CRGOVuwT.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-DUaF2eBH.css">
   </head>
   <body>
+    <div id="gate">
+      <div class="gate-card">
+        <div class="gate-title">SAI RUNNER &mdash; TEAM ACCESS</div>
+        <form id="gate-form" autocomplete="off">
+          <input
+            id="gate-pass"
+            class="gate-input"
+            type="password"
+            placeholder="Access code"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+          />
+          <button class="gate-btn" type="submit">ENTER</button>
+          <div class="gate-error" id="gate-error"></div>
+        </form>
+      </div>
+    </div>
+    <script>
+      // Client-side access gate. See the CSS comment above for what this is and is not. The known
+      // code's SHA-256 hash ships here so a quick view-source does not hand over the plaintext; a
+      // determined visitor with dev tools could still brute force offline or just read the network
+      // tab once unlocked, which is why this is framed as a speed bump, not a security boundary.
+      (function () {
+        var gate = document.getElementById("gate");
+        if (!gate) return;
+        var KEY = "sai-runner-gate-ok";
+        var HASH = "b611825a0af3036e578fe7662fd4e57e65f80636039f3f1ad83f76d1d2cdd281";
+        var PLAIN_FALLBACK = "SAIletm3in";
+
+        function unlock() {
+          gate.classList.add("gate-gone");
+        }
+        function remember() {
+          try {
+            window.localStorage.setItem(KEY, HASH);
+          } catch (e) {
+            // Storage blocked: the session still unlocks, it just re-prompts next visit.
+          }
+        }
+        try {
+          if (window.localStorage && window.localStorage.getItem(KEY) === HASH) {
+            unlock();
+            return;
+          }
+        } catch (e) {
+          // Storage blocked entirely; fall through to the prompt every time.
+        }
+
+        var form = document.getElementById("gate-form");
+        var input = document.getElementById("gate-pass");
+        var error = document.getElementById("gate-error");
+        input.focus();
+
+        function sha256Hex(text) {
+          var enc = new TextEncoder().encode(text);
+          return crypto.subtle.digest("SHA-256", enc).then(function (buf) {
+            return Array.prototype.map
+              .call(new Uint8Array(buf), function (b) {
+                return b.toString(16).padStart(2, "0");
+              })
+              .join("");
+          });
+        }
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var val = input.value;
+          // WebCrypto needs a secure context (https, or localhost for dev). Both this deploy and
+          // the local dev server qualify, but a direct compare is the fallback if it is ever missing.
+          var digestPromise =
+            window.crypto && window.crypto.subtle ? sha256Hex(val) : Promise.reject(new Error("no subtle crypto"));
+          digestPromise
+            .then(function (digest) {
+              if (digest === HASH) {
+                remember();
+                unlock();
+              } else {
+                error.textContent = "Wrong code.";
+                input.value = "";
+                input.focus();
+              }
+            })
+            .catch(function () {
+              if (val === PLAIN_FALLBACK) {
+                remember();
+                unlock();
+              } else {
+                error.textContent = "Wrong code.";
+                input.value = "";
+                input.focus();
+              }
+            });
+        });
+      })();
+    </script>
     <div id="app"></div>
     <div id="boot" role="status" aria-live="polite">
       <div>
