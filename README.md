@@ -7,7 +7,7 @@ in your own browser.
 
 ## Play it now
 
-The fastest way: open **https://www.markuswalker.com/sai-runner** and play.
+The fastest way: open the published GitHub Pages deployment and play.
 
 ## Run it locally
 
@@ -60,4 +60,4 @@ given anyway because it is good manners.
 
 ## Licence
 
-MIT, Copyright (c) 2026 M. Walker. See `LICENSE`.
+MIT, Copyright (c) 2026 M.Walker. See `LICENSE`.
