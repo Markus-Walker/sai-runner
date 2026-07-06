@@ -7,7 +7,7 @@ in your own browser.
 
 ## Play it now
 
-The fastest way: open the published GitHub Pages deployment and play.
+The fastest way: open **https://www.markuswalker.com/sai-runner** and play.
 
 ## Run it locally
 
